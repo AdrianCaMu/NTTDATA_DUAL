@@ -12,13 +12,13 @@ import nttdata.hibernate.services.interfaces.ClienteManagementServiceI;
 
 public class MainApp {
 	public static void main(String[] args) {
-		// Apertura de sesión.
+		// Apertura de sesiÃ³n.
 		final Session session = HibernateUtil.getSessionFactory().openSession();
 
-		// Inicialización de servicios.
+		// InicializaciÃ³n de servicios.
 		final ClienteManagementServiceI clientService = new ClienteManagementServiceImpl(session);
 
-		// Auditoría.
+		// AuditorÃ­a.
 		final String updatedUser = "ACM";
 		final Date updatedDate = new Date();
 
@@ -57,11 +57,16 @@ public class MainApp {
 		}
 		
 		List<Client> clients2 = clientService.searchAll();
+
+		for (final Client client : clients2) {
+			System.out.println(client.getName() + " | " + client.getSurname() + " | " + client.getDni());
+		}
 		
 		Long id = (long) 1;
-		Client cliente3 = clientService.searchById(id);
+		Client clients3 = clientService.searchById(id);
+		System.out.println(clients3);
 		
-		// Cierre de sesión.
+		// Cierre de sesiÃ³n.
 		session.close();
 	}
 }
