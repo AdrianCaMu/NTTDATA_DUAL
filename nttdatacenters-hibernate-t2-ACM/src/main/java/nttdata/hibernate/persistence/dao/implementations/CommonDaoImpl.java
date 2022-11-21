@@ -1,0 +1,124 @@
+package nttdata.hibernate.persistence.dao.implementations;
+
+import java.lang.reflect.ParameterizedType;
+import java.util.List;
+import org.hibernate.Session;
+
+import nttdata.hibernate.persistence.dao.interfaces.CommonDaoI;
+import nttdata.hibernate.persistence.entities.AbstractEntity;
+
+/**
+ * Common Dao Implementation
+ * 
+ * @author Adrian Camara Munoz
+ */
+public abstract class CommonDaoImpl<T extends AbstractEntity> implements CommonDaoI<T> {
+
+	/** Tipo de clase */
+	private Class<T> entityClass;
+
+	/** Sesión de conexión a BD */
+	private Session session;
+
+	/**
+	 * Método constructor.
+	 * 
+	 * @param session
+	 */
+	@SuppressWarnings("unchecked")
+	protected CommonDaoImpl(Session session) {
+		setEntityClass(
+				(Class<T>) ((ParameterizedType) this.getClass().getGenericSuperclass()).getActualTypeArguments()[0]);
+		this.session = session;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Long insert(T paramT) {
+
+		// Verificación de sesión abierta.
+		if (!session.getTransaction().isActive()) {
+			session.getTransaction().begin();
+		}
+
+		// Insercción.
+		Long id = (Long) session.save(paramT);
+		session.flush();
+
+		// Commit.
+		session.getTransaction().commit();
+		
+		return id;
+	}
+
+	@Override
+	public void update(final T paramT) {
+
+		// Verificación de sesión abierta.
+		if (!session.getTransaction().isActive()) {
+			session.getTransaction().begin();
+		}
+
+		// Insercción.
+		session.saveOrUpdate(paramT);
+
+		// Commit.
+		session.getTransaction().commit();
+	}
+
+	@Override
+	public void delete(final T paramT) {
+
+		// Verificación de sesión abierta.
+		if (!session.getTransaction().isActive()) {
+			session.getTransaction().begin();
+		}
+
+		// Insercción.
+		session.delete(paramT);
+
+		// Commit.
+		session.getTransaction().commit();
+	}
+
+	@Override
+	public T searchById(final Long id) {
+
+		// Verificación de sesión abierta.
+		if (!session.getTransaction().isActive()) {
+			session.getTransaction().begin();
+		}
+
+		// Búsqueda por PK.
+		return session.get(this.entityClass, id);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<T> searchAll() {
+
+		// Verificación de sesión abierta.
+		if (!session.getTransaction().isActive()) {
+			session.getTransaction().begin();
+		}
+
+		// Búsqueda de todos los registros.
+		return session.createQuery("FROM " + this.entityClass.getName()).list();
+
+	}
+
+	/**
+	 * @return the entityClass
+	 */
+	public Class<T> getEntityClass() {
+		return entityClass;
+	}
+
+	/**
+	 * @param entityClass the entityClass to set
+	 */
+	public void setEntityClass(Class<T> entityClass) {
+		this.entityClass = entityClass;
+	}
+
+}
